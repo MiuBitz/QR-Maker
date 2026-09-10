@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Maker Studio | Create Custom QR Codes</title>
+  <meta name="description" content="Generate high-resolution custom QR codes for websites, Wi-Fi networks, text, and contacts. Customize colors, add logos, and download in HD.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header Section -->
+    <header class="app-header">
+      <div class="logo-area">
+        <div class="brand-badge">
+          <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+            <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+            <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+            <rect x="14" y="14" width="4" height="4"></rect>
+            <path d="M18 14v4h2"></path>
+            <path d="M14 20h6"></path>
+          </svg>
+          <span class="badge-text">Studio Edition</span>
+        </div>
+        <h1 class="brand-title">QR Maker <span>Studio</span></h1>
+      </div>
+      <p class="brand-subtitle">Create high-definition, customizable QR codes instantly for games, websites, Wi-Fi & more.</p>
+
+      <!-- Quick Preset Bar -->
+      <div class="preset-bar">
+        <button type="button" class="preset-chip active" id="preset-miusoft" data-url="https://miusoftgames.github.io/">
+          <span class="chip-icon">🌐</span> Miusoft Games
+        </button>
+        <button type="button" class="preset-chip" id="preset-google" data-url="https://google.com">
+          <span class="chip-icon">🔍</span> Google
+        </button>
+        <button type="button" class="preset-chip" id="preset-github" data-url="https://github.com">
+          <span class="chip-icon">🐙</span> GitHub
+        </button>
+        <button type="button" class="preset-chip" id="preset-youtube" data-url="https://youtube.com">
+          <span class="chip-icon">▶️</span> YouTube
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="studio-grid">
+      <!-- Left Configuration Panel -->
+      <section class="config-panel">
+        <!-- Content Type Tabs -->
+        <div class="type-nav" role="tablist">
+          <button class="tab-btn active" data-tab="url" role="tab" id="tab-url">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+            Website URL
+          </button>
+          <button class="tab-btn" data-tab="text" role="tab" id="tab-text">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="21" y1="6" x2="3" y2="6"></line><line x1="15" y1="12" x2="3" y2="12"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg>
+            Plain Text
+          </button>
+          <button class="tab-btn" data-tab="wifi" role="tab" id="tab-wifi">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+            Wi-Fi
+          </button>
+          <button class="tab-btn" data-tab="contact" role="tab" id="tab-contact">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            Email
+          </button>
+        </div>
+
+        <!-- Form Panels -->
+        <div class="form-container">
+          <!-- URL Tab Content -->
+          <div class="tab-content active" id="content-url">
+            <div class="input-group">
+              <label for="url-input" class="input-label">Website Address (URL)</label>
+              <div class="input-wrapper">
+                <span class="input-prefix">https://</span>
+                <input type="text" id="url-input" class="text-input" placeholder="miusoftgames.github.io/" value="miusoftgames.github.io/">
+                <button type="button" class="clear-btn" id="btn-clear-url" title="Clear input">✕</button>
+              </div>
+              <p class="input-hint">Enter your game or website link. Mobile cameras will automatically open it on scan.</p>
+            </div>
+          </div>
+
+          <!-- Text Tab Content -->
+          <div class="tab-content" id="content-text">
+            <div class="input-group">
+              <label for="text-input" class="input-label">Plain Text / Message</label>
+              <textarea id="text-input" class="textarea-input" rows="3" placeholder="Type any secret message, notes, or promo code here..."></textarea>
+              <p class="input-hint">Characters count: <span id="char-count">0</span></p>
+            </div>
+          </div>
+
+          <!-- Wi-Fi Tab Content -->
+          <div class="tab-content" id="content-wifi">
+            <div class="grid-2">
+              <div class="input-group">
+                <label for="wifi-ssid" class="input-label">Network Name (SSID)</label>
+                <input type="text" id="wifi-ssid" class="text-input" placeholder="Home_Guest_5G">
+              </div>
+              <div class="input-group">
+                <label for="wifi-auth" class="input-label">Encryption</label>
+                <select id="wifi-auth" class="select-input">
+                  <option value="WPA">WPA / WPA2 / WPA3</option>
+                  <option value="WEP">WEP</option>
+                  <option value="nopass">None (Open)</option>
+                </select>
+              </div>
+            </div>
+            <div class="input-group">
+              <label for="wifi-pass" class="input-label">Password</label>
+              <input type="password" id="wifi-pass" class="text-input" placeholder="••••••••">
+            </div>
+          </div>
+
+          <!-- Email Tab Content -->
+          <div class="tab-content" id="content-contact">
+            <div class="input-group">
+              <label for="email-addr" class="input-label">Recipient Email</label>
+              <input type="email" id="email-addr" class="text-input" placeholder="creator@miusoftgames.com">
+            </div>
+            <div class="input-group">
+              <label for="email-subject" class="input-label">Subject</label>
+              <input type="text" id="email-subject" class="text-input" placeholder="General Inquiry / Feedback">
+            </div>
+          </div>
+        </div>
+
+        <!-- Customization Section -->
+        <div class="customization-card">
+          <h2 class="section-title">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            Styling & Customization
+          </h2>
+
+          <!-- Colors Row -->
+          <div class="settings-grid">
+            <div class="color-picker-box">
+              <label for="fg-color" class="setting-label">Dots Color</label>
+              <div class="color-input-wrap">
+                <input type="color" id="fg-color" value="#0f172a">
+                <input type="text" id="fg-hex" class="hex-text" value="#0F172A" maxlength="7">
+              </div>
+            </div>
+
+            <div class="color-picker-box">
+              <label for="bg-color" class="setting-label">Background</label>
+              <div class="color-input-wrap">
+                <input type="color" id="bg-color" value="#ffffff">
+                <input type="text" id="bg-hex" class="hex-text" value="#FFFFFF" maxlength="7">
+              </div>
+            </div>
+          </div>
+
+          <!-- Color Themes -->
+          <div class="theme-presets">
+            <span class="setting-label">Color Palettes:</span>
+            <div class="swatches">
+              <button type="button" class="swatch-btn" data-fg="#0f172a" data-bg="#ffffff" title="Classic Monochrome">
+                <span class="swatch-half" style="background:#0f172a"></span>
+                <span class="swatch-half" style="background:#ffffff"></span>
+              </button>
+              <button type="button" class="swatch-btn" data-fg="#2563eb" data-bg="#eff6ff" title="Ocean Blue">
+                <span class="swatch-half" style="background:#2563eb"></span>
+                <span class="swatch-half" style="background:#eff6ff"></span>
+              </button>
+              <button type="button" class="swatch-btn" data-fg="#7c3aed" data-bg="#f5f3ff" title="Indigo Violet">
+                <span class="swatch-half" style="background:#7c3aed"></span>
+                <span class="swatch-half" style="background:#f5f3ff"></span>
+              </button>
+              <button type="button" class="swatch-btn" data-fg="#059669" data-bg="#ecfdf5" title="Emerald Mint">
+                <span class="swatch-half" style="background:#059669"></span>
+                <span class="swatch-half" style="background:#ecfdf5"></span>
+              </button>
+              <button type="button" class="swatch-btn" data-fg="#dc2626" data-bg="#fff1f2" title="Crimson Warmth">
+                <span class="swatch-half" style="background:#dc2626"></span>
+                <span class="swatch-half" style="background:#fff1f2"></span>
+              </button>
+              <button type="button" class="swatch-btn" data-fg="#d97706" data-bg="#fffbeb" title="Amber Sunshine">
+                <span class="swatch-half" style="background:#d97706"></span>
+                <span class="swatch-half" style="background:#fffbeb"></span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Center Icon / Badge -->
+          <div class="icon-selector-area">
+            <div class="label-with-hint">
+              <label class="setting-label">Center Emblem / Icon</label>
+              <span class="badge-tag">Auto-boosts to High Error Correction</span>
+            </div>
+            <div class="icon-options">
+              <button type="button" class="icon-chip active" data-icon="none">None</button>
+              <button type="button" class="icon-chip" data-icon="rocket">🚀 Rocket</button>
+              <button type="button" class="icon-chip" data-icon="game">🎮 Game</button>
+              <button type="button" class="icon-chip" data-icon="link">🔗 Link</button>
+              <button type="button" class="icon-chip" data-icon="star">⭐ Star</button>
+              <button type="button" class="icon-chip" data-icon="heart">❤️ Heart</button>
+              <label class="icon-upload-chip" for="custom-logo-input" title="Upload your own logo">
+                <span>📁 Upload</span>
+                <input type="file" id="custom-logo-input" accept="image/png, image/jpeg, image/svg+xml" style="display:none">
+              </label>
+            </div>
+            <div id="uploaded-preview-badge" class="uploaded-badge hidden">
+              <span id="uploaded-filename">logo.png</span>
+              <button type="button" id="btn-remove-logo" title="Remove logo">✕</button>
+            </div>
+          </div>
+
+          <!-- Size & Quality Controls -->
+          <div class="settings-grid">
+            <div class="input-group">
+              <label for="export-size" class="setting-label">Export Resolution</label>
+              <select id="export-size" class="select-input">
+                <option value="300">Standard (300 × 300 px)</option>
+                <option value="500" selected>High Res (500 × 500 px)</option>
+                <option value="1000">Ultra HD Print (1000 × 1000 px)</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label for="correction-level" class="setting-label">Error Correction</label>
+              <select id="correction-level" class="select-input">
+                <option value="L">Low (7% recovery)</option>
+                <option value="M">Medium (15% recovery)</option>
+                <option value="Q">Quartile (25% recovery)</option>
+                <option value="H" selected>High (30% recovery - best)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Live Preview & Download Panel -->
+      <section class="preview-panel">
+        <div class="preview-sticky-card">
+          <div class="preview-card-header">
+            <div class="status-indicator">
+              <span class="pulse-dot"></span>
+              <span class="status-text">Live Preview</span>
+            </div>
+            <span class="scannable-pill">Scannable</span>
+          </div>
+
+          <!-- QR Code Canvas Display Frame -->
+          <div class="qr-canvas-frame" id="qr-frame">
+            <!-- Hidden container for library render -->
+            <div id="qrcode-target" style="display:none;"></div>
+            <!-- High quality master canvas -->
+            <canvas id="render-canvas"></canvas>
+          </div>
+
+          <!-- QR Target Decoded Summary -->
+          <div class="target-summary">
+            <span class="summary-label">Target URL / Text:</span>
+            <span class="summary-url" id="summary-text" title="Target destination">https://miusoftgames.github.io/</span>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            <button type="button" class="btn btn-primary" id="btn-download">
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              <span>Download PNG</span>
+            </button>
+            <button type="button" class="btn btn-secondary" id="btn-copy">
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>Copy Image</span>
+            </button>
+          </div>
+
+          <!-- Quick Test Link -->
+          <div class="preview-footer">
+            <a href="https://miusoftgames.github.io/" target="_blank" rel="noopener noreferrer" id="test-link" class="external-link">
+              <span>Open Link in New Tab</span>
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast" role="alert" aria-live="polite">
+      <span class="toast-icon">✓</span>
+      <span class="toast-message" id="toast-text">Downloaded successfully!</span>
+    </div>
+  </div>
+
+  <!-- QR Code Engine (Local Vendor File) -->
+  <script src="qrcode.min.js"></script>
+  <!-- Main Studio App Script -->
+  <script src="script.js"></script>
+</body>
+</html>
