@@ -18,6 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const fgHexInput = document.getElementById('fg-hex');
   const bgColorPicker = document.getElementById('bg-color');
   const bgHexInput = document.getElementById('bg-hex');
+  const showBackground = document.getElementById('show-background');
+  const darkMode = document.getElementById('dark-mode');
   const swatches = document.querySelectorAll('.swatch-btn');
 
   const iconChips = document.querySelectorAll('.icon-chip');
@@ -44,8 +46,16 @@ document.addEventListener('DOMContentLoaded', () => {
   let activeTab = 'url';
   let selectedIcon = 'none'; // 'none' | 'rocket' | 'game' | 'link' | 'star' | 'heart' | 'custom'
   let customLogoImage = null;
-  let qrEngine = null;
   let debounceTimeout = null;
+
+  darkMode.checked = document.documentElement.dataset.theme === 'dark';
+  darkMode.addEventListener('change', () => {
+    const theme = darkMode.checked ? 'dark' : 'light';
+    document.documentElement.dataset.theme = theme;
+    try {
+      localStorage.setItem('qr-maker-theme', theme);
+    } catch {}
+  });
 
   // Error Correction mapping for QRCode.js
   const correctLevels = {
@@ -94,6 +104,17 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   syncColor(fgColorPicker, fgHexInput);
   syncColor(bgColorPicker, bgHexInput);
+
+  function updateBackgroundControls() {
+    bgColorPicker.disabled = !showBackground.checked;
+    bgHexInput.disabled = !showBackground.checked;
+    renderCanvas.classList.toggle('transparent-preview', !showBackground.checked);
+  }
+
+  showBackground.addEventListener('change', () => {
+    updateBackgroundControls();
+    generateQRCode();
+  });
 
   // Preset Palette Swatches
   swatches.forEach(swatch => {
@@ -238,6 +259,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Core Render Routine
   function generateQRCode() {
+    clearTimeout(debounceTimeout);
+    debounceTimeout = null;
     const rawPayload = getPayload();
     summaryText.textContent = rawPayload;
     summaryText.title = rawPayload;
@@ -250,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const fgColor = fgColorPicker.value;
-    const bgColor = bgColorPicker.value;
+    const bgColor = showBackground.checked ? bgColorPicker.value : null;
     const levelKey = correctionLevelSelect.value || 'H';
     const correctLevel = correctLevels[levelKey] !== undefined ? correctLevels[levelKey] : 2;
     const exportDim = parseInt(exportSizeSelect.value, 10) || 500;
@@ -260,83 +283,100 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       // Use QRCode.js to create the base QR Matrix
-      new QRCode(qrcodeTarget, {
+      const qr = new QRCode(qrcodeTarget, {
         text: rawPayload,
-        width: exportDim,
-        height: exportDim,
-        colorDark: fgColor,
-        colorLight: bgColor,
+        width: 1,
+        height: 1,
         correctLevel: correctLevel
       });
 
-      // Small delay to allow canvas or img element to render in DOM
-      setTimeout(() => {
-        paintToMasterCanvas(exportDim, bgColor, fgColor);
-      }, 50);
+      // Read the matrix from the bundled QRCode.js version.
+      paintToMasterCanvas(qr._oQRCode, exportDim, bgColor, fgColor);
     } catch (err) {
       console.error('QR Code generation error:', err);
     }
   }
 
   // Draw onto the master render canvas with high DPI and optional emblem
-  function paintToMasterCanvas(dim, bgColor, fgColor) {
-    const ctx = renderCanvas.getContext('2d');
+  function paintToMasterCanvas(matrix, dim, bgColor, fgColor) {
     renderCanvas.width = dim;
     renderCanvas.height = dim;
+    const ctx = renderCanvas.getContext('2d');
 
-    const sourceCanvas = qrcodeTarget.querySelector('canvas');
-    const sourceImg = qrcodeTarget.querySelector('img');
-
-    if (sourceCanvas) {
-      ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(sourceCanvas, 0, 0, dim, dim);
-      drawCenterEmblem(ctx, dim, bgColor, fgColor);
-    } else if (sourceImg && sourceImg.src) {
-      const img = new Image();
-      img.onload = () => {
-        ctx.imageSmoothingEnabled = false;
-        ctx.drawImage(img, 0, 0, dim, dim);
-        drawCenterEmblem(ctx, dim, bgColor, fgColor);
-      };
-      img.src = sourceImg.src;
+    if (bgColor) {
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(0, 0, dim, dim);
     }
+
+    const moduleCount = matrix.getModuleCount();
+    const quietZone = 4;
+    const moduleSize = dim / (moduleCount + quietZone * 2);
+    const edges = Array.from({ length: moduleCount + 1 }, (_, index) =>
+      Math.round((index + quietZone) * moduleSize)
+    );
+    ctx.fillStyle = fgColor;
+    for (let row = 0; row < moduleCount; row++) {
+      for (let col = 0; col < moduleCount; col++) {
+        if (matrix.isDark(row, col)) {
+          ctx.fillRect(edges[col], edges[row], edges[col + 1] - edges[col], edges[row + 1] - edges[row]);
+        }
+      }
+    }
+
+    drawCenterEmblem(ctx, dim, bgColor, fgColor, moduleSize);
   }
 
   // Draw Center Emblem (Emoji or Custom Logo)
-  function drawCenterEmblem(ctx, dim, bgColor, fgColor) {
+  function drawCenterEmblem(ctx, dim, bgColor, fgColor, moduleSize) {
     if (selectedIcon === 'none') return;
 
     const center = dim / 2;
     const badgeSize = Math.round(dim * 0.22);
     const radius = Math.round(badgeSize * 0.28);
     const half = badgeSize / 2;
+    const hasCustomLogo = selectedIcon === 'custom' && customLogoImage;
 
     // Draw background badge pill
     ctx.save();
     ctx.beginPath();
     ctx.roundRect(center - half, center - half, badgeSize, badgeSize, radius);
-    ctx.fillStyle = bgColor;
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
-    ctx.shadowBlur = Math.round(dim * 0.02);
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = Math.round(dim * 0.008);
-    ctx.fill();
+    if (bgColor) {
+      ctx.fillStyle = bgColor;
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
+      ctx.shadowBlur = Math.round(dim * 0.02);
+      ctx.shadowOffsetY = Math.round(dim * 0.008);
+      ctx.fill();
+    } else {
+      ctx.save();
+      ctx.clip();
+      ctx.clearRect(0, 0, dim, dim);
+      ctx.restore();
+    }
 
-    // Subtle border matching QR color
-    ctx.lineWidth = Math.max(2, Math.round(dim * 0.008));
-    ctx.strokeStyle = fgColor;
-    ctx.stroke();
+    if (!hasCustomLogo) {
+      ctx.lineWidth = Math.max(2, Math.round(dim * 0.008));
+      ctx.strokeStyle = fgColor;
+      ctx.stroke();
+    }
     ctx.restore();
 
     // Render Emoji or Logo
-    if (selectedIcon === 'custom' && customLogoImage) {
-      const imgPad = badgeSize * 0.16;
-      const imgDim = badgeSize - (imgPad * 2);
+    if (hasCustomLogo) {
       ctx.save();
+      // Offset the stroke so its inner edge meets the logo's rounded edge.
+      const outlineOffset = moduleSize / 2;
+      const outlineStart = center - half - outlineOffset;
+      const outlineSize = badgeSize + moduleSize;
       ctx.beginPath();
-      ctx.roundRect(center - half + imgPad, center - half + imgPad, imgDim, imgDim, radius * 0.7);
+      ctx.roundRect(outlineStart, outlineStart, outlineSize, outlineSize, radius + outlineOffset);
+      ctx.lineWidth = moduleSize;
+      ctx.strokeStyle = '#ffffff';
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.roundRect(center - half, center - half, badgeSize, badgeSize, radius);
       ctx.clip();
-      ctx.drawImage(customLogoImage, center - half + imgPad, center - half + imgPad, imgDim, imgDim);
+      ctx.drawImage(customLogoImage, center - half, center - half, badgeSize, badgeSize);
       ctx.restore();
     } else {
       let emoji = '🚀';
@@ -357,6 +397,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Download Handler
   btnDownload.addEventListener('click', () => {
+    if (debounceTimeout !== null) generateQRCode();
     renderCanvas.toBlob((blob) => {
       if (!blob) return;
       const url = URL.createObjectURL(blob);
@@ -381,6 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Copy to Clipboard Handler
   btnCopy.addEventListener('click', async () => {
+    if (debounceTimeout !== null) generateQRCode();
     try {
       renderCanvas.toBlob(async (blob) => {
         if (!blob) throw new Error('Could not create blob');
@@ -400,5 +442,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Initial trigger on load
+  updateBackgroundControls();
   generateQRCode();
 });

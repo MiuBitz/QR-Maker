@@ -3,8 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QR Maker Studio | Create Custom QR Codes</title>
-  <meta name="description" content="Generate high-resolution custom QR codes for websites, Wi-Fi networks, text, and contacts. Customize colors, add logos, and download in HD.">
+  <title>Custom QR Code Generator | QR Maker Studio</title>
+  <meta name="description" content="Create custom QR codes for websites, Wi-Fi, text, and email. Add a logo, choose your colors, and download a high-resolution PNG with a solid or transparent background.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="QR Maker Studio">
+  <meta property="og:title" content="Custom QR Code Generator | QR Maker Studio">
+  <meta property="og:description" content="Create custom QR codes for websites, Wi-Fi, text, and email. Add a logo and download a high-resolution PNG with a solid or transparent background.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" sizes="any">
+  <script>
+    try {
+      if (localStorage.getItem('qr-maker-theme') === 'dark') {
+        document.documentElement.dataset.theme = 'dark';
+      }
+    } catch {}
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -14,6 +26,10 @@
   <div class="app-container">
     <!-- Header Section -->
     <header class="app-header">
+      <label class="theme-toggle setting-label">
+        <input type="checkbox" id="dark-mode" role="switch">
+        Dark mode
+      </label>
       <div class="logo-area">
         <div class="brand-badge">
           <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -28,7 +44,7 @@
         </div>
         <h1 class="brand-title">QR Maker <span>Studio</span></h1>
       </div>
-      <p class="brand-subtitle">Create high-definition, customizable QR codes instantly for games, websites, Wi-Fi & more.</p>
+      <p class="brand-subtitle">Create custom QR codes for websites, Wi-Fi, text, and email. Download a high-resolution PNG with a solid or transparent background.</p>
 
       <!-- Quick Preset Bar -->
       <div class="preset-bar">
@@ -153,6 +169,10 @@
                 <input type="color" id="bg-color" value="#ffffff">
                 <input type="text" id="bg-hex" class="hex-text" value="#FFFFFF" maxlength="7">
               </div>
+              <label class="background-toggle setting-label">
+                <input type="checkbox" id="show-background" role="switch" checked>
+                Show background
+              </label>
             </div>
           </div>
 
